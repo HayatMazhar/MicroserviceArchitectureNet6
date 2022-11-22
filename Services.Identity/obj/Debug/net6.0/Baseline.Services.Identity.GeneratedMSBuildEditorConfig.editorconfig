@@ -12,7 +12,7 @@ build_property.RootNamespace = Baseline.Services.Identity
 build_property.ProjectDir = C:\Users\mqadir\Desktop\core\Scad\codebasae\shelve\personal\baselines\Net6-Microservice\Services.Identity\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
-build_property.GenerateRazorMetadataSourceChecksumAttributes = true
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
 build_property.MSBuildProjectDirectory = C:\Users\mqadir\Desktop\core\Scad\codebasae\shelve\personal\baselines\Net6-Microservice\Services.Identity
 build_property._RazorSourceGeneratorDebug = 
 
