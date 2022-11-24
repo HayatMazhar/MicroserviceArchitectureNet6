@@ -10,12 +10,13 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
     public class CartApiController : Controller
     {
         private readonly ICartRepository _cartRepository;
-        protected ResponseDto _response;
+        protected new ResponseDto Response;
+
 
         public CartApiController(ICartRepository cartRepository)
         {
             _cartRepository = cartRepository;
-            this._response = new ResponseDto();
+            Response = new ResponseDto();
         }
 
         [HttpGet("GetCart/{userId}")]
@@ -23,15 +24,15 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                CartDto cartDto = await _cartRepository.GetCartByUserId(userId);
-                _response.Result = cartDto;
+                var cartDto = await _cartRepository.GetCartByUserId(userId);
+                Response.Data = cartDto;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
         [HttpPost("AddUpdateCart")]
@@ -39,15 +40,15 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                CartDto cartDto = await _cartRepository.CreateUpdateCart(cart);
-                _response.Result = cartDto;
+                var cartDto = await _cartRepository.CreateUpdateCart(cart);
+                Response.Data = cartDto;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
         [HttpPost("RemoveCart")]
@@ -55,15 +56,15 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                bool isSuccess = await _cartRepository.RemoveFromCart(cartId);
-                _response.Result = isSuccess;
+                var isSuccess = await _cartRepository.RemoveFromCart(cartId);
+                Response.Data = isSuccess;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
         [HttpPost("ClearCart")]
@@ -71,15 +72,15 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                bool isSuccess = await _cartRepository.ClearCart(cartId);
-                _response.Result = isSuccess;
+                var isSuccess = await _cartRepository.ClearCart(cartId);
+                Response.Data = isSuccess;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
         [HttpPost("ApplyCoupon")]
@@ -89,15 +90,15 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
             var coupon = cartDto.CartHeader.CouponCode;
             try
             {
-                bool isSuccess = await _cartRepository.ApplyCoupon(user, coupon);
-                _response.Result = isSuccess;
+                var isSuccess = await _cartRepository.ApplyCoupon(user, coupon);
+                Response.Data = isSuccess;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
         [HttpPost("RemoveCoupon")]
@@ -105,15 +106,16 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                bool isSuccess = await _cartRepository.RemoveCoupon(userId);
-                _response.Result = isSuccess;
+                var isSuccess = await _cartRepository.RemoveCoupon(userId);
+                Response.Data = isSuccess;
             }
-            catch (Exception e)
+            
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
         [HttpPost("Checkout")]
@@ -121,7 +123,7 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
         {
             try
             {
-                CartDto cartDto = await _cartRepository.GetCartByUserId(checkoutHeader.UserId);
+                var cartDto = await _cartRepository.GetCartByUserId(checkoutHeader.UserId);
 
                 if (cartDto == null) return BadRequest();
 
@@ -129,12 +131,12 @@ namespace Baseline.Services.ShoppingCartAPI.Controllers
 
                 //TODO: logic to add message to process order
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _response.IsSuccess = false;
-                _response.ErrorMessages = new List<string> { e.ToString() };
+                Response.IsSuccess = false;
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
-            return _response;
+            return Response;
         }
 
     }

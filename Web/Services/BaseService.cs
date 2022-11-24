@@ -1,8 +1,11 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
+using Baseline.Web.Globalization;
+using Baseline.Web.Helpers;
 using Baseline.Web.Models;
 using Baseline.Web.Services.IServices;
 using Newtonsoft.Json;
+using static System.GC;
 
 namespace Baseline.Web.Services;
 
@@ -21,7 +24,7 @@ public class BaseService : IBaseService
         try
         {
             var client = HttpClient.CreateClient("BaselineAPI");
-            HttpRequestMessage message = new HttpRequestMessage();
+            var message = new HttpRequestMessage();
             message.Headers.Add("Accept", "application/json");
             message.RequestUri = new Uri(apiRequest.Url);
             client.DefaultRequestHeaders.Clear();
@@ -37,25 +40,15 @@ public class BaseService : IBaseService
                     new AuthenticationHeaderValue("Bearer", apiRequest.AccessToken);
             }
 
-            HttpResponseMessage apiResponse = null;
-
-            switch (apiRequest.ApiType)
+            message.Method = apiRequest.ApiType switch
             {
-                case SD.ApiType.Post:
-                    message.Method = HttpMethod.Post;
-                    break;
-                case SD.ApiType.Put:
-                    message.Method = HttpMethod.Put;
-                    break;
-                case SD.ApiType.Delete:
-                    message.Method = HttpMethod.Delete;
-                    break;
-                default:
-                    message.Method = HttpMethod.Get;
-                    break;
-            }
+                SD.ApiType.Post => HttpMethod.Post,
+                SD.ApiType.Put => HttpMethod.Put,
+                SD.ApiType.Delete => HttpMethod.Delete,
+                _ => HttpMethod.Get
+            };
 
-            apiResponse = await client.SendAsync(message);
+            var apiResponse = await client.SendAsync(message);
 
             var apiContent = await apiResponse.Content.ReadAsStringAsync();
             var apiResponseDto = JsonConvert.DeserializeObject<T>(apiContent);
@@ -66,8 +59,7 @@ public class BaseService : IBaseService
         {
             var dto = new ResponseDto
             {
-                DisplayMessage = "Error",
-                ErrorMessages = new List<string> { Convert.ToString(e.Message) },
+                Error = new List<ErrorResponseDto> { new() { Code = "500", Text = Convert.ToString(e.Message) } },
                 IsSuccess = false
             };
 
@@ -78,6 +70,6 @@ public class BaseService : IBaseService
     }
     public void Dispose()
     {
-        GC.SuppressFinalize(true);
+        SuppressFinalize(this);
     }
 }

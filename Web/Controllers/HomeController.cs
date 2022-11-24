@@ -13,8 +13,8 @@ namespace Baseline.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IProductService _productService;
         private readonly ICartService _cartService;
-
-
+        protected new ResponseDto Response;
+        
         public HomeController(ILogger<HomeController> logger, IProductService productService, ICartService cartService)
         {
             _logger = logger;
@@ -25,10 +25,10 @@ namespace Baseline.Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<ProductRequestDto> list = new();
-            var response = await _productService.GetAllProductsAsync<ResponseDto>("");
-            if (response != null && response.IsSuccess)
+            Response = await _productService.GetAllProductsAsync<ResponseDto>("");
+            if (Response != null && Response.IsSuccess)
             {
-                list = JsonConvert.DeserializeObject<List<ProductRequestDto>>(Convert.ToString(response.Result)!);
+                list = JsonConvert.DeserializeObject<List<ProductRequestDto>>(Convert.ToString(Response.Data)!);
             }
             return View(list);
         }
@@ -40,7 +40,7 @@ namespace Baseline.Web.Controllers
             var response = await _productService.GetProductByIdAsync<ResponseDto>(productId, " ");
             if (response is { IsSuccess: true })
             {
-                model = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(response.Result)!);
+                model = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(response.Data)!);
             }
             return View(model);
         }
@@ -65,11 +65,11 @@ namespace Baseline.Web.Controllers
             };
 
 
-            var response = await _productService.GetProductByIdAsync<ResponseDto>(productDto.ProductId, " ");
+            Response = await _productService.GetProductByIdAsync<ResponseDto>(productDto.ProductId, " ");
 
-            if (response != null && response.IsSuccess)
+            if (Response != null && Response.IsSuccess)
             {
-                cartDetails.Product = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(response.Result)!);
+                cartDetails.Product = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(Response.Data)!);
             }
 
             List<CartDetailsDto> cartDetailsDtos = new();

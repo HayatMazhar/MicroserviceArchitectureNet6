@@ -1,23 +1,20 @@
 using Baseline.Web;
-using Baseline.Web.Services;
-using Baseline.Web.Services.IServices;
+using Baseline.Web.Globalization;
+using Baseline.Web.Helpers;
+using Baseline.Web.Middleware;
 using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
+DiResolver.ConfigureServices(builder);
 
-// Add services to the container.
-builder.Services.AddHttpClient<IProductService, ProductService>();
-builder.Services.AddHttpClient<ICartService, CartService>();
-builder.Services.AddHttpClient<ICouponService, CouponService>();
+builder.Services.AddControllersWithViews();
+
+// set apis base url
 SD.ProductApiBase = builder.Configuration["ServiceUrls:ProductAPI"];
 SD.ShoppingCartApiBase = builder.Configuration["ServiceUrls:ShoppingCartAPI"];
 SD.CouponApiBase = builder.Configuration["ServiceUrls:CouponAPI"];
 
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<ICartService, CartService>();
-builder.Services.AddScoped<ICouponService, CouponService>();
-builder.Services.AddControllersWithViews();
-
+//authentication and authorization
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = "Cookies";
@@ -57,8 +54,9 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// global error handler
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.Run();

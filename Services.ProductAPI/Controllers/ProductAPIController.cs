@@ -22,16 +22,15 @@ namespace Baseline.Services.ProductAPI.Controllers
         {
             try
             {
-                var productRequestDtos = await _productRepository.GetAllProducts();
-                ResponseDto.Result = productRequestDtos;
+                var productRequestDtos = await _productRepository.GetAllProductsByDapper();
+                ResponseDto.Data = productRequestDtos;
                 ResponseDto.IsSuccess = true;
 
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 ResponseDto.IsSuccess = false;
-                ResponseDto.ErrorMessages = new List<string>() { e.ToString() };
-
+                ResponseDto.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
             return ResponseDto;
         }
@@ -43,13 +42,13 @@ namespace Baseline.Services.ProductAPI.Controllers
             try
             {
                 ProductRequestDto productRequestDto = await _productRepository.GetProductById(id);
-                ResponseDto.Result = productRequestDto;
+                ResponseDto.Data = productRequestDto;
                 ResponseDto.IsSuccess = true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 ResponseDto.IsSuccess = false;
-                ResponseDto.ErrorMessages = new List<string>() { e.ToString() };
+                ResponseDto.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
 
             return ResponseDto;
@@ -61,15 +60,14 @@ namespace Baseline.Services.ProductAPI.Controllers
         {
             try
             {
-                ProductRequestDto productRequestDtoModel =
-                    await _productRepository.CreateUpdateProduct(productRequestDto);
-                ResponseDto.Result = productRequestDtoModel;
+                ProductRequestDto productRequestDtoModel = await _productRepository.CreateUpdateProduct(productRequestDto);
+                ResponseDto.Data = productRequestDtoModel;
                 ResponseDto.IsSuccess = true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 ResponseDto.IsSuccess = false;
-                ResponseDto.ErrorMessages = new List<string>() { e.ToString() };
+                ResponseDto.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
 
             return ResponseDto;
@@ -83,13 +81,13 @@ namespace Baseline.Services.ProductAPI.Controllers
             {
                 ProductRequestDto productRequestDtoModel =
                     await _productRepository.CreateUpdateProduct(productRequestDto);
-                ResponseDto.Result = productRequestDtoModel;
+                ResponseDto.Data = productRequestDtoModel;
                 ResponseDto.IsSuccess = true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 ResponseDto.IsSuccess = false;
-                ResponseDto.ErrorMessages = new List<string>() { e.ToString() };
+                ResponseDto.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
 
             return ResponseDto;
@@ -103,13 +101,13 @@ namespace Baseline.Services.ProductAPI.Controllers
             try
             {
                 bool isSuccessDto = await _productRepository.DeleteProduct(id);
-                ResponseDto.Result = isSuccessDto;
+                ResponseDto.Data = isSuccessDto;
                 ResponseDto.IsSuccess = true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 ResponseDto.IsSuccess = false;
-                ResponseDto.ErrorMessages = new List<string>() { e.ToString() };
+                ResponseDto.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
 
             return ResponseDto;

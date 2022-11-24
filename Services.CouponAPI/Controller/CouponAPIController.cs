@@ -23,16 +23,16 @@ namespace Baseline.Services.CouponAPI.Controllers
             try
             {
                 var coupon = await _couponRepository.GetCouponByCode(code);
-                Response.Result = coupon;
+                Response.Data = coupon;
             }
             catch (Exception ex)
             {
                 Response.IsSuccess = false;
-                Response.ErrorMessages = new List<string>() { ex.ToString() };
+                Response.Error = new List<ErrorResponseDto> { new() { Code = "500", Text = ex.ToString() } };
             }
 
             return Response;
-        } 
+        }
 
     }
 }

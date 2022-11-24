@@ -177,7 +177,7 @@ namespace Baseline.Services.Identity.MainModule.Account
             // build a model so the logged out page knows what to display
             var vm = await BuildLoggedOutViewModelAsync(model.LogoutId);
 
-            if (User?.Identity.IsAuthenticated == true)
+            if (User?.Identity is { IsAuthenticated: true })
             {
                 // delete local authentication cookie
                 await _signInManager.SignOutAsync();

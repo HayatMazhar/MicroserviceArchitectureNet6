@@ -1,4 +1,4 @@
-﻿using static Baseline.Web.SD;
+﻿using static Baseline.Web.Helpers.SD;
 
 namespace Baseline.Web.Models
 {

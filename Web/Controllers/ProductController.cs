@@ -9,6 +9,7 @@ namespace Baseline.Web.Controllers
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
+        protected new ResponseDto Response;
 
         public ProductController(IProductService productService)
         {
@@ -19,11 +20,13 @@ namespace Baseline.Web.Controllers
         {
             List<ProductRequestDto> list = new();
             var accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _productService.GetAllProductsAsync<ResponseDto>(accessToken);
-            if (response != null && response.IsSuccess)
+            Response  = await _productService.GetAllProductsAsync<ResponseDto>(accessToken);
+            
+            if (Response is { IsSuccess: true })
             {
-                list = JsonConvert.DeserializeObject<List<ProductRequestDto>>(Convert.ToString(response.Result)!);
+                list = JsonConvert.DeserializeObject<List<ProductRequestDto>>(Convert.ToString(Response.Data)!);
             }
+            
             return View(list);
         }
 
@@ -36,14 +39,14 @@ namespace Baseline.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProductCreate(ProductRequestDto model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+            
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            Response = await _productService.CreateProductAsync<ResponseDto>(model, accessToken);
+           
+            if (Response != null && Response.IsSuccess)
             {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var response = await _productService.CreateProductAsync<ResponseDto>(model, accessToken);
-                if (response != null && response.IsSuccess)
-                {
-                    return RedirectToAction(nameof(ProductCreate));
-                }
+                return RedirectToAction(nameof(ProductCreate));
             }
 
             return View(model);
@@ -52,10 +55,11 @@ namespace Baseline.Web.Controllers
         public async Task<IActionResult> ProductEdit(int productId)
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _productService.GetProductByIdAsync<ResponseDto>(productId, accessToken);
-            if (response != null && response.IsSuccess)
+            Response = await _productService.GetProductByIdAsync<ResponseDto>(productId, accessToken);
+           
+            if (Response is { IsSuccess: true })
             {
-                ProductRequestDto model = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(response.Result)!);
+                ProductRequestDto model = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(Response.Data)!);
                 return View(model);
             }
             return NotFound();
@@ -65,14 +69,14 @@ namespace Baseline.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProductEdit(ProductRequestDto model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+            
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            Response = await _productService.UpdateProductAsync<ResponseDto>(model, accessToken);
+            
+            if (Response is { IsSuccess: true })
             {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var response = await _productService.UpdateProductAsync<ResponseDto>(model, accessToken);
-                if (response is { IsSuccess: true })
-                {
-                    return RedirectToAction(nameof(ProductIndex));
-                }
+                return RedirectToAction(nameof(ProductIndex));
             }
 
             return View(model);
@@ -81,10 +85,11 @@ namespace Baseline.Web.Controllers
         public async Task<IActionResult> ProductDelete(int productId)
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _productService.GetProductByIdAsync<ResponseDto>(productId, accessToken);
-            if (response is not { IsSuccess: true }) return NotFound();
+            Response = await _productService.GetProductByIdAsync<ResponseDto>(productId, accessToken);
+            
+            if (Response is not { IsSuccess: true }) return NotFound();
 
-            var model = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(response.Result)!);
+            var model = JsonConvert.DeserializeObject<ProductRequestDto>(Convert.ToString(Response.Data)!);
             return View(model);
         }
 
@@ -92,16 +97,15 @@ namespace Baseline.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProductDelete(ProductRequestDto model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(model);
+            
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            Response  = await _productService.DeleteProductAsync<ResponseDto>(model.ProductId, accessToken);
+            
+            if (Response.IsSuccess)
             {
-                var accessToken = await HttpContext.GetTokenAsync("access_token");
-                var response = await _productService.DeleteProductAsync<ResponseDto>(model.ProductId, accessToken);
-                if (response.IsSuccess)
-                {
-                    return RedirectToAction(nameof(ProductIndex));
-                }
+                return RedirectToAction(nameof(ProductIndex));
             }
-
             return View(model);
         }
     }

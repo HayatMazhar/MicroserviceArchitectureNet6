@@ -1,8 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using AutoMapper;
 using Baseline.Services.ProductAPI.DbContexts;
 using Baseline.Services.ProductAPI.Models;
 using Baseline.Services.ProductAPI.Models.Dto;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using Dapper;
 
 namespace Baseline.Services.ProductAPI.Repository
 {
@@ -10,11 +13,14 @@ namespace Baseline.Services.ProductAPI.Repository
     {
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
+        private readonly string _connectionString;
 
-        public ProductRepository(IMapper mapper, ApplicationDbContext db)
+
+        public ProductRepository(IMapper mapper, ApplicationDbContext db, IConfiguration config) 
         {
             _mapper = mapper;
             _db = db;
+            _connectionString = config.GetConnectionString("DefaultConnection");
         }
         public async Task<ProductRequestDto> CreateUpdateProduct(ProductRequestDto productRequestDto)
         {
@@ -59,6 +65,15 @@ namespace Baseline.Services.ProductAPI.Repository
         {
             List<Product> productsList = await _db.Products.ToListAsync();
             return _mapper.Map<List<ProductRequestDto>>(productsList);
+        }
+
+        public async Task<IEnumerable<ProductRequestDto>> GetAllProductsByDapper()
+        {
+            using IDbConnection db = new SqlConnection(_connectionString);
+            const string query = "SELECT * FROM PRODUCTS";
+            var products = await db.QueryAsync<Product>(query);
+            return _mapper.Map<List<ProductRequestDto>>(products);
+
         }
 
         public async Task<ProductRequestDto> GetProductById(int productId)

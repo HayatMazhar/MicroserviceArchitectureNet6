@@ -1,14 +1,14 @@
-﻿using Baseline.Web.Models;
+﻿using Baseline.Web.Globalization;
+using Baseline.Web.Helpers;
+using Baseline.Web.Models;
 using Baseline.Web.Services.IServices;
 
 namespace Baseline.Web.Services
 {
     public class ProductService : BaseService, IProductService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         public ProductService(IHttpClientFactory httpClient) : base(httpClient)
         {
-            _httpClientFactory = httpClient;
         }
         public async Task<T> CreateProductAsync<T>(ProductRequestDto productDto, string token)
         {

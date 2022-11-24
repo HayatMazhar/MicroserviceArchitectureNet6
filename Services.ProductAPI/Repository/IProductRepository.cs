@@ -2,8 +2,9 @@
 
 namespace Baseline.Services.ProductAPI.Repository
 {
-    public interface IProductRepository
+    public interface IProductRepository 
     {
+        Task<IEnumerable<ProductRequestDto>> GetAllProductsByDapper();
         Task<IEnumerable<ProductRequestDto>> GetAllProducts();
         Task<ProductRequestDto> GetProductById(int productId);
         Task<ProductRequestDto> CreateUpdateProduct(ProductRequestDto productRequestDto);

@@ -1,4 +1,4 @@
-﻿namespace Baseline.Web
+﻿namespace Baseline.Web.Helpers
 {
     public static class SD
     {

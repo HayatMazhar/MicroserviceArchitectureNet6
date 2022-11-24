@@ -1,14 +1,14 @@
-﻿using Baseline.Web.Models;
+﻿using Baseline.Web.Globalization;
+using Baseline.Web.Helpers;
+using Baseline.Web.Models;
 using Baseline.Web.Services.IServices;
 
 namespace Baseline.Web.Services
 {
     public class CartService : BaseService,ICartService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         public CartService(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
         }
         public async Task<T> GetCartByUserIdAsync<T>(string userId, string token = null)
         {
